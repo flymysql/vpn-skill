@@ -70,6 +70,17 @@ async function main() {
     try {
       const ls = await exec(c2, `ls ${result.remoteDir} ${remoteBase}/state`, { timeoutMs: 15000 });
       check('远端残留文件可枚举（上传生效）', /common\.sh/.test(ls.stdout) && /state\.env/.test(ls.stdout));
+
+      // 回归 #6：以 sudo 提权执行时，state.env 一度是 root:600，
+      // 使本机 CLI 用普通账号读不回来 —— 表现为「部署成功却报失败」。
+      if (result.usedSudo && result.usedSudo !== 'none(fallback)') {
+        const st = await exec(c2, `stat -c '%U %a' ${remoteBase}/state/state.env`, { timeoutMs: 15000 });
+        const [owner, mode] = st.stdout.trim().split(/\s+/);
+        check('提权执行后状态文件属主已让回调用者（回归 #6）', owner === USER, `${owner} mode=${mode}`);
+        check('状态文件权限仍为 600', mode === '600', mode);
+      } else {
+        check('提权执行后状态文件属主已让回调用者（回归 #6）', true, `本次未提权（usedSudo=${result.usedSudo}）`);
+      }
     } finally {
       await close(c2);
     }

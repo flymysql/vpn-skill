@@ -79,7 +79,17 @@ function stateOf(env, name) {
 
 function main() {
   if (!BASH) {
-    console.log('未找到可用的 bash，跳过服务端脚本自测（可用 VPNSKILL_BASH 指定）');
+    // 宁可失败也不要「假绿」：以前找不到 bash 只打印一句就退出 0，
+    // 结果是本地/CI 看起来测试通过，实际上一条都没跑。
+    const hint = '请安装 Git for Windows / bash，或用 VPNSKILL_BASH=<bash路径> 指定';
+    if (process.env.VPNSKILL_ALLOW_NO_BASH === '1') {
+      console.log(`未找到 bash，按 VPNSKILL_ALLOW_NO_BASH=1 跳过（未验证任何行为）`);
+      return;
+    }
+    console.error('未找到可用的 bash，无法执行服务端脚本自测。');
+    console.error(`  ${hint}`);
+    console.error('  确实要跳过：设置 VPNSKILL_ALLOW_NO_BASH=1');
+    process.exitCode = 1;
     return;
   }
   console.log(`\n==== 服务端脚本离线自测 (bash: ${BASH}) ====\n`);

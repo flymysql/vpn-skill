@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node: ['20', '22']
+        node: ['20', '22', '24']
 
     steps:
       - uses: actions/checkout@v4
@@ -30,8 +30,11 @@ jobs:
         shell: bash
         run: node tests/bash/run-bash-tests.mjs
 
-      - name: 单元测试（配置生成 / 分享链接 / 参数解析）
+      - name: 单元测试（配置生成 / 分享链接 / 参数解析 / 字节不变量）
         run: npm test
+
+      - name: JS 语法检查
+        run: npm run lint:js
 
       - name: CLI 自检（不应崩溃）
         run: node bin/vpn.mjs doctor || true

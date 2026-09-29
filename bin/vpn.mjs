@@ -316,7 +316,6 @@ async function cmdDoctor(args) {
     ssh2ok = true;
   } catch { /* ignore */ }
   checks.push(['ssh2 依赖已安装', ssh2ok, ssh2ok ? 'ok' : '请在项目目录执行 npm install']);
-  const sshBin = process.platform === 'win32' ? 'powershell.exe' : 'bash';
   checks.push(['平台', true, `${process.platform}/${process.arch}`]);
   const dir = clientDir(args);
   checks.push(['客户端目录', fs.existsSync(dir), dir]);

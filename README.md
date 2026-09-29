@@ -210,7 +210,7 @@ node bin/vpn.mjs link
 本仓库自带三层可离线跑的验证：
 
 ```bash
-npm test              # 14 项单元测试：配置生成 / 分享链接 / 参数解析 / 转义
+npm test              # 22 项：配置生成 / 分享链接 / 参数解析 / 转义 + 字节不变量自检
 npm run test:bash     # 32 项服务端脚本自测：dry-run 真跑 bash，验幂等/覆盖/注入防护
 npm run test:e2e      # 18 项本机端到端：本机起 ssserver 当"服务端"，
                       # 下载 mihomo → 起进程 → 真实过代理出网 → 系统代理开关往返

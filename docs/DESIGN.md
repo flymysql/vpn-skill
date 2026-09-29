@@ -101,10 +101,10 @@ Reality 的私钥**不进 `state.env`**（避免本机持有服务端私钥）�
 
 | 层 | 命令 | 项数 | 覆盖 |
 |---|---|---|---|
-| 单元 | `npm test` | 14 | YAML 发射/转义、三种协议配置、分享链接、参数解析、env 注入转义、资产命名、镜像 URL |
+| 单元 | `npm test` | 22 | YAML 发射/转义、三种协议配置、分享链接、参数解析、env 注入转义、资产命名、镜像 URL |
 | 服务端脚本 | `npm run test:bash` | 32 | dry-run 真跑 bash：状态输出、配置生成、**幂等**、`--force` 语义、命令行覆盖历史、非法值拒绝、卸载脚本、stdout 纯净性 |
 | 本机端到端 | `npm run test:e2e` | 18 | **真实代理链**：本地起 `ssserver` 当服务端 → 下载 mihomo → 起进程 → 经代理拿 204 → 查出口 IP → 系统代理设置/还原往返 |
-| SSH 集成 | `npm run test:ssh` | 9 | ssh2 连接（含 `~/.ssh/config`）、SFTP 上传、远端提权执行、状态回读、客户端装配 |
+| SSH 集成 | `npm run test:ssh` | 11 | ssh2 连接（含 `~/.ssh/config`）、SFTP 上传、远端提权执行、状态回读、客户端装配 |
 
 ### `test:e2e` 到底证明了什么
 
@@ -131,8 +131,13 @@ Reality 的私钥**不进 `state.env`**（避免本机持有服务端私钥）�
 | 6 | 非 root 登录 + 免密 sudo 时 `state.env` 属 root:600 | **部署成功但 CLI 报失败**，用户以为白干了 | 提权通道回读（`cat` → `sudo cat`）+ 执行时 `chown` 回 `SUDO_UID` |
 | 7 | 显式 `--key` 失败就放弃 | `~/.ssh/config` 里明明有能用的 key 却连不上 | 多凭据依次尝试 |
 | 8 | 未解析 `~/.ssh/config` | 用户得把已经配好的 User/Port/IdentityFile 再抄一遍 | 实现 config 解析（含 `Include`、glob 匹配、首个命中优先） |
+| 9 | `vendor/upstream/*.sh` 工作树里是 CRLF（git 索引是 LF，工作树未重写） | 直接执行/审计这些脚本会在 Linux 上报 `$'\r': command not found`；"提交的内容"与"我看到的内容"不一致 | 归一化为 LF，并新增**字节不变量测试**（`.sh` 必须 LF、`.ps1` 必须带 BOM、不得含 NUL、frontmatter/许可/ignore 必须齐） |
+| 10 | `run-bash-tests.mjs` 找不到 bash 时只打印一句就 `exit 0` | **假绿**：本地/CI 看着通过，实际一条断言都没跑 | 改为非 0 退出，并给出 `VPNSKILL_BASH` / `VPNSKILL_ALLOW_NO_BASH=1` 的明确出路 |
+| 11 | `npm test` 用带引号 glob（`node --test "tests/unit/*.test.mjs"`） | Node 20 不支持 `--test` 的 glob 参数 ⇒ CI 矩阵里 Node 20 退化成 0 用例（又一个假绿） | 改用裸 `node --test`（按 Node 内置规则发现 `**/*.test.mjs`；实测只命中单元测试、不会误跑 e2e），`engines` 收紧到 `>=20` |
+| 12 | 非 root + 提权场景缺回归覆盖 | 缺陷 #6 修完只写在文档里，未来容易回归 | 在 SSH 集成测试里加断言：提权执行后 `state.env` 属主须等于登录用户且权限 600（实测通过） |
 
 第 4 和第 6 条如果只做"看着像对"的实现，会直接导致功能不可用 —— 它们都是被真实执行抓出来的。
+第 9–11 条则说明：**"测试通过"本身也需要被测**（假绿比没有测试更危险）。
 
 ### 复现测试
 

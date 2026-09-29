@@ -44,15 +44,16 @@
     "LICENSE"
   ],
   "engines": {
-    "node": ">=18.17"
+    "node": ">=20"
   },
   "scripts": {
-    "test": "node --test \"tests/unit/*.test.mjs\"",
+    "test": "node --test",
     "test:bash": "node tests/bash/run-bash-tests.mjs",
     "test:e2e": "node tests/e2e/local-e2e.mjs",
     "test:ssh": "node tests/integration/ssh-deploy.mjs",
     "test:all": "npm run lint:sh && npm test && npm run test:bash && npm run test:e2e",
     "lint:sh": "bash -n server/common.sh && bash -n server/hy2.sh && bash -n server/ss-rust.sh && bash -n server/reality.sh && bash -n server/uninstall.sh",
+    "lint:js": "node --check bin/vpn.mjs && node --check src/util.mjs && node --check src/ssh.mjs && node --check src/archive.mjs && node --check src/download.mjs && node --check src/protocols.mjs && node --check src/client.mjs && node --check src/deploy.mjs && node --check src/index.mjs",
     "vpn": "node bin/vpn.mjs"
   },
   "dependencies": {
