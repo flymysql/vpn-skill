@@ -1,0 +1,21 @@
+vpn-skill
+Copyright 2026 flymysql
+
+This product is a derivative work of chugzb/VPN
+(https://github.com/chugzb/VPN, commit b93e540947e9e3598488ae485379f65b839fc7b9),
+which is licensed under the Apache License, Version 2.0.
+
+The following components are derived from or based on that project:
+
+  server/hy2.sh            derived from vendor/upstream/hy2.sh
+  server/ss-rust.sh        derived from vendor/upstream/ss-rust.sh
+  server/reality.sh        derived from vendor/upstream/reality.sh
+  vendor/upstream/*        verbatim copies (kept for provenance)
+
+The original scripts are retained unmodified in vendor/upstream/ together with
+the upstream LICENSE file. Modifications made by this project are listed in the
+"上游改了什么" section of docs/DESIGN.md.
+
+Third-party software downloaded at runtime (not distributed by this project):
+  MetaCubeX/mihomo, apernet/hysteria, XTLS/Xray-core, shadowsocks/shadowsocks-rust
+  Each is fetched from its own upstream release and remains under its own license.

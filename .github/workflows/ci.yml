@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: tests (${{ matrix.os }} / node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: ['20', '22']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: 安装依赖
+        run: npm install --no-audit --no-fund
+
+      - name: 服务端脚本语法检查 + dry-run 自测（幂等/覆盖/注入防护）
+        shell: bash
+        run: node tests/bash/run-bash-tests.mjs
+
+      - name: 单元测试（配置生成 / 分享链接 / 参数解析）
+        run: npm test
+
+      - name: CLI 自检（不应崩溃）
+        run: node bin/vpn.mjs doctor || true
+
+      - name: 端到端自测（本机起 ssserver 当服务端，真实过代理出网）
+        if: matrix.os != 'windows-latest' || matrix.node == '22'
+        run: node tests/e2e/local-e2e.mjs
+
+  lint-shell:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck 服务端脚本
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y shellcheck
+          shellcheck --severity=warning server/*.sh || true
+          for f in server/*.sh; do bash -n "$f"; done

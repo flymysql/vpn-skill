@@ -1,0 +1,27 @@
+# deps
+node_modules/
+package-lock.json
+
+# 测试产物 / 缓存（下载的内核与测试用 ssserver）
+tests/.cache/
+tests/.tmp/
+
+# 本机运行时状态（可能含凭据！绝不入库）
+.vpn-skill/
+vpn-skill/
+state.env
+meta.json
+link.txt
+subscription.yaml
+*.backup.json
+
+# 日志
+*.log
+mihomo.log
+
+# 编辑器 / 系统
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

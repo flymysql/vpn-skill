@@ -1,0 +1,19 @@
+# 服务端脚本必须保持 LF：它们会被上传到 Linux 执行。
+# 本仓库在 Windows 上开发（全局 core.autocrlf=true），若不显式声明，
+# 检出会变成 CRLF，远端 bash 会报 "$'\r': command not found"。
+*.sh text eol=lf
+
+# PowerShell 脚本需要保留 UTF-8 BOM：
+# Windows PowerShell 5.1 会把无 BOM 的 UTF-8 当 ANSI 读，含中文的脚本直接语法错误。
+# 用 -text 让 git 完全不做换行/BOM 归一化，字节原样保存。
+*.ps1 -text
+
+*.md text
+*.json text
+*.mjs text
+*.yml text
+
+# 二进制资产按二进制处理
+*.zip binary
+*.gz binary
+*.exe binary

@@ -1,0 +1,74 @@
+{
+  "name": "vpn-skill",
+  "version": "1.0.0",
+  "description": "只要给我海外服务器的登录方式，我就把 VPN 服务端部署好、在本机装好客户端并连上（Hysteria2 / Shadowsocks / VLESS-Reality）",
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": "flymysql",
+  "homepage": "https://github.com/flymysql/vpn-skill#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flymysql/vpn-skill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/flymysql/vpn-skill/issues"
+  },
+  "keywords": [
+    "vpn",
+    "hysteria2",
+    "shadowsocks",
+    "vless",
+    "reality",
+    "mihomo",
+    "clash",
+    "agent-skill",
+    "dsh-skill"
+  ],
+  "bin": {
+    "vpn-skill": "bin/vpn.mjs",
+    "vpn": "bin/vpn.mjs"
+  },
+  "main": "src/index.mjs",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./protocols": "./src/protocols.mjs"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "server/",
+    "docs/",
+    "vendor/",
+    "SKILL.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "test": "node --test \"tests/unit/*.test.mjs\"",
+    "test:bash": "node tests/bash/run-bash-tests.mjs",
+    "test:e2e": "node tests/e2e/local-e2e.mjs",
+    "test:ssh": "node tests/integration/ssh-deploy.mjs",
+    "test:all": "npm run lint:sh && npm test && npm run test:bash && npm run test:e2e",
+    "lint:sh": "bash -n server/common.sh && bash -n server/hy2.sh && bash -n server/ss-rust.sh && bash -n server/reality.sh && bash -n server/uninstall.sh",
+    "vpn": "node bin/vpn.mjs"
+  },
+  "dependencies": {
+    "ssh2": "^1.17.0"
+  },
+  "optionalDependencies": {},
+  "sync": {
+    "pinned": {
+      "mihomo": "v1.19.31",
+      "hysteria": "app/v2.12.3",
+      "xray": "v26.3.27",
+      "shadowsocks-rust": "v1.25.0"
+    },
+    "upstream": {
+      "repo": "https://github.com/chugzb/VPN",
+      "commit": "b93e540947e9e3598488ae485379f65b839fc7b9"
+    }
+  }
+}
